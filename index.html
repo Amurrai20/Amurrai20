@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Review Website</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Book Review Website</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#authors">Authors</a></li>
+            <li><a href="#publications">Publications</a></li>
+            <li><a href="#book-request">Book Request</a></li>
+        </ul>
+    </nav>
+    <section id="authors">
+        <h2>Fan Pages of Renowned Authors</h2>
+        <ul id="author-list">
+            <!-- Author fan pages content will be dynamically added here -->
+        </ul>
+    </section>
+
+    <section id="author-publications">
+        <h2>Publications of Selected Author</h2>
+        <div id="author-publication-details">
+            <!-- Author's publications content will be dynamically added here -->
+        </div>
+    </section>
+
+    <section id="publications">
+        <h2>All Publications</h2>
+        <!-- Publications content -->
+    </section>
+    <section id="book-request">
+        <h2>Book Request</h2>
+        <!-- Book request form -->
+    </section>
+    <footer>
+        <p>&copy; 2024 Book Review Website</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
+// Sample data representing authors and their nationalities
+const authorsData = [
+    { name: "J.K. Rowling", nationality: "British" },
+    { name: "Gabriel García Márquez", nationality: "Spanish" }
+    // Add more authors as needed
+];
+
+// Function to populate authors section
+function populateAuthors() {
+    const authorList = document.getElementById("author-list");
+    authorsData.forEach(author => {
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `<a href="#" onclick="showAuthorPublications('${author.name}')">${author.name}</a> (${author.nationality})`;
+        authorList.appendChild(listItem);
+    });
+}
+
+// Function to show publications of a selected author
+function showAuthorPublications(authorName) {
+    const author = authorsData.find(author => author.name === authorName);
+    const authorPublicationDetails = document.getElementById("author-publication-details");
+    authorPublicationDetails.innerHTML = `<p>Loading publications...</p>`;
+
+    // Fetching publications using Google Books API
+    const script = document.createElement("script");
+    script.src = `https://www.googleapis.com/books/v1/volumes?q=author:${authorName}&callback=handleResponse`;
+    document.body.appendChild(script);
+}
+
+// Function to handle response from Google Books API
+function handleResponse(response) {
+    const author = response.items[0].volumeInfo.authors[0];
+    const publications = response.items.map(item => item.volumeInfo.title);
+    const authorPublicationDetails = document.getElementById("author-publication-details");
+    if (author) {
+        authorPublicationDetails.innerHTML = `<p><strong>${author}'s Publications:</strong></p>`;
+        publications.forEach(publication => {
+            authorPublicationDetails.innerHTML += `<p>${publication}</p>`;
+        });
+    } else {
+        authorPublicationDetails.innerHTML = "<p>No publications found for this author.</p>";
+    }
+}
+
+// Call the function to populate authors when the page loads
+window.onload = populateAuthors;
+
